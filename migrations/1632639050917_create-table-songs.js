@@ -28,11 +28,11 @@ exports.up = (pgm) => {
       type: 'SMALLINT',
       notNull: true,
     },
-    insertedAt: {
+    inserted_at: {
       type: 'VARCHAR(255)',
       notNull: true,
     },
-    updatedAt: {
+    updated_at: {
       type: 'VARCHAR(255)',
       notNull: true,
     },
