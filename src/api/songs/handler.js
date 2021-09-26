@@ -1,4 +1,4 @@
-const ClientError = require('../../error/ClientError');
+const ClientError = require('../../exceptions/ClientError');
 
 class SongsHandler {
     constructor(service, validator) {
@@ -96,7 +96,7 @@ class SongsHandler {
         }
     }
 
-    errorResponse(error, server) {
+    errorResponse(error, server) { 
         if (error instanceof ClientError) {
             const response = server.response({
                 status: 'fail',
