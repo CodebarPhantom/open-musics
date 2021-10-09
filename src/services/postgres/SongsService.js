@@ -12,7 +12,7 @@ class SongsService {
     async addSongs({
         title, year, performer, genre, duration,
     }) {
-        const id = nanoid(16);
+        const id = `song-${nanoid(16)}`;
         const insertedAt = new Date().toISOString();
 
         const query = {
@@ -36,7 +36,7 @@ class SongsService {
 
     async getSongById(id) {
         const query = {
-            text: 'SELECT * FROM songs WHERE id = $1',
+            text: 'SELECT id, title, performer FROM songs WHERE id = $1',
             values: [id],
         };
 
