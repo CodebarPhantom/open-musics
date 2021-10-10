@@ -16,7 +16,7 @@ class SongsHandler {
         try {
             this._validator.validateSongPayload(request.payload);
             const {
-                title = 'untitled', year, performer, genre, duration,
+                title = 'Belom ada judul', year, performer, genre, duration, // kayak inget sesuatu
             } = request.payload;
 
             const id = await this._service.addSongs({
