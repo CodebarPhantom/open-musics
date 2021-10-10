@@ -1,4 +1,4 @@
-const InvariantError = require('../../error/InvariantError');
+const InvariantError = require('../../exceptions/InvariantError');
 const {
     PostAuthenticationPayloadSchema,
     PutAuthenticationPayloadSchema,

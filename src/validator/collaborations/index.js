@@ -1,7 +1,7 @@
 const {
     postCollaborationSchema, deleteCollaborationSchema,
 } = require('./schema');
-const InvariantError = require('../../error/InvariantError');
+const InvariantError = require('../../exceptions/InvariantError');
 
 const collaborationValidator = {
     validatePostCollaborationSchema: (payload) => {

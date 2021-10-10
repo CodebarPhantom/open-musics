@@ -14,10 +14,9 @@ class SongsHandler {
 
     async postSongHandler(request, h) {
         try {
-      
             this._validator.validateSongPayload(request.payload);
             const {
-                title = 'Belom ada judul', year, performer, genre, duration, // kayak inget sesuatu
+                title = 'untitled', year, performer, genre, duration,
             } = request.payload;
 
             const id = await this._service.addSongs({
@@ -39,15 +38,19 @@ class SongsHandler {
         }
     }
 
-    async getSongsHandler() {
-        const getSongs = await this._service.getSongs();
+    async getSongsHandler(h) {
+        try {
+            const getSongs = await this._service.getSongs();
 
-        return {
-            status: 'success',
-            data: {
-                songs: getSongs,
-            },
-        };
+            return {
+                status: 'success',
+                data: {
+                    songs: getSongs,
+                },
+            };
+        } catch (error) {
+            return this.errorResponse(error, h);
+        }
     }
 
     async getSongByIdHandler(request, h) {
@@ -69,13 +72,18 @@ class SongsHandler {
     async putSongByIdHandler(request, h) {
         try {
             this._validator.validateSongPayload(request.payload);
+            const {
+                title, year, performer, genre, duration,
+            } = request.payload;
             const { songId } = request.params;
 
-            await this._service.editSongById(songId, request.payload);
+            await this._service.editSongById(songId, {
+                title, year, performer, genre, duration,
+            });
 
             return {
                 status: 'success',
-                message: 'Lagu berhasil diperbarui',
+                message: 'lagu berhasil diperbarui',
             };
         } catch (error) {
             return this.errorResponse(error, h);
@@ -89,7 +97,7 @@ class SongsHandler {
 
             return {
                 status: 'success',
-                message: 'Lagu berhasil dihapus',
+                message: 'lagu berhasil dihapus',
             };
         } catch (error) {
             return this.errorResponse(error, h);

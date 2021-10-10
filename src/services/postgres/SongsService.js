@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const { mapDBToModel, getSongs } = require('../../utils/mapDBModel');
+const { mapDBToModel, mapGetSongs } = require('../../utils/mapDBModel');;
 
 class SongsService {
     constructor() {
@@ -12,12 +12,12 @@ class SongsService {
     async addSongs({
         title, year, performer, genre, duration,
     }) {
-        const id = `song-${nanoid(16)}`;
+        const id = nanoid(16);
         const insertedAt = new Date().toISOString();
 
         const query = {
             text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING id',
-            values: [id, title, year, performer, genre, duration, insertedAt],
+            values: [`song-${id}`, title, year, performer, genre, duration, insertedAt],
         };
 
         const result = await this._pool.query(query);
@@ -30,13 +30,13 @@ class SongsService {
     }
 
     async getSongs() {
-        const result = await this._pool.query('SELECT * FROM songs');
-        return result.rows.map(getSongs);
+        const result = await this._pool.query('SELECT id, title, performer FROM songs');
+        return result.rows.map(mapGetSongs);
     }
 
     async getSongById(id) {
         const query = {
-            text: 'SELECT id, title, performer FROM songs WHERE id = $1',
+            text: 'SELECT * FROM songs WHERE id = $1',
             values: [id],
         };
 

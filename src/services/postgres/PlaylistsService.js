@@ -1,9 +1,9 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const { mapGetPlaylists, mapGetSongs } = require('../../utils/mapDBModel');
-const InvariantError = require('../../error/InvariantError');
-const NotFoundError = require('../../error/NotFoundError');
-const AuthorizationError = require('../../error/AuthorizationError');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
     constructor(collaborationsService) {

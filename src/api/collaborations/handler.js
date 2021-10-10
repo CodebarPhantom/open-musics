@@ -1,4 +1,4 @@
-const ClientError = require('../../error/ClientError');
+const ClientError = require('../../exceptions/ClientError');
 
 class collaborationsHandler {
     constructor(collaborationsService, playlistsService, validator) {

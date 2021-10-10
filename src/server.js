@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
@@ -6,28 +5,28 @@ const Jwt = require('@hapi/jwt');
 
 // songs
 const songs = require('./api/songs');
-const SongsService = require('./service/postgres/SongsService');
+const SongsService = require('./services/postgres/SongsService');
 const SongsValidator = require('./validator/songs');
 
 // users
 const users = require('./api/users');
-const UsersService = require('./service/postgres/UsersService');
+const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
 
 // authentications
 const authentications = require('./api/authentications');
-const AuthenticationsService = require('./service/postgres/AuthenticationsService');
+const AuthenticationsService = require('./services/postgres/AuthenticationsService');
 const TokenManager = require('./tokenize/tokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
 // playlists
 const playlists = require('./api/playlists');
-const PlaylistsService = require('./service/postgres/PlaylistsService');
+const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PlaylistsValidator = require('./validator/playlists');
 
 // colaborations
 const collaborations = require('./api/collaborations');
-const CollaborationsService = require('./service/postgres/CollaborationsService');
+const CollaborationsService = require('./services/postgres/CollaborationsService');
 const CollaborationsValidator = require('./validator/collaborations');
 
 const init = async () => {

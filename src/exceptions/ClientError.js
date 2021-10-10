@@ -1,4 +1,4 @@
-class CLientError extends Error {
+class ClientError extends Error {
     constructor(message, statusCode = 400) {
         super(message);
         this.name = 'Client Error';
@@ -6,4 +6,4 @@ class CLientError extends Error {
     }
 }
 
-module.exports = CLientError;
+module.exports = ClientError;
