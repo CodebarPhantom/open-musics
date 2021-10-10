@@ -38,7 +38,7 @@ class AuthenticationsHandler {
             response.code(201);
             return response;
         } catch (error) {
-            return this._failedResponse(error, h);
+            return this.errorResponse(error, h);
         }
     }
 
@@ -60,7 +60,7 @@ class AuthenticationsHandler {
                 },
             };
         } catch (error) {
-            return this._failedResponse(error, h);
+            return this.errorResponse(error, h);
         }
     }
 
@@ -77,11 +77,11 @@ class AuthenticationsHandler {
                 message: 'Refresh token berhasil dihapus',
             };
         } catch (error) {
-            return this._failedResponse(error, h);
+            return this.errorResponse(error, h);
         }
     }
 
-    _failedResponse(error, server) {
+    errorResponse(error, server) {
         if (error instanceof ClientError) {
             const response = server.response({
                 status: 'fail',
