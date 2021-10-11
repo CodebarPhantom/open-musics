@@ -36,7 +36,7 @@ class SongsService {
 
     async getSongById(id) {
         const query = {
-            text: 'SELECT id, title, performer FROM songs WHERE id = $1',
+            text: 'SELECT * FROM songs WHERE id = $1',
             values: [id],
         };
 
