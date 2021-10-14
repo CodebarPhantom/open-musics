@@ -34,6 +34,11 @@ const _exports = require('./api/exports');
 const ProducerService = require('./service/exports/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
+// uploads
+const uploads = require('./api/uploads');
+const UploadsService = require('./service/uploads/UploadsService');
+const UploadsValidator = require('./validator/uploads');
+
 
 const init = async () => {
 
@@ -42,6 +47,7 @@ const init = async () => {
     const authenticationsService = new AuthenticationsService();
     const collaborationsService = new CollaborationsService();
     const playlistsService = new PlaylistsService(collaborationsService);
+    const uploadsService = new UploadsService(path.resolve(__dirname, process.env.UPLOADS_DIRECTORY));
 
     const server = Hapi.server({
         host: process.env.HOST,
@@ -122,6 +128,13 @@ const init = async () => {
                 exportsService: ProducerService,
                 playlistsService,
                 validator: ExportsValidator,
+            },
+        },
+        {
+            plugin: uploads,
+            options: {
+                service: uploadsService,
+                validator: UploadsValidator,
             },
         },
         
