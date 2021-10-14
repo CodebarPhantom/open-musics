@@ -1,4 +1,5 @@
-const ClientError = require('../../exceptions/ClientError');
+const autoBind = require('auto-bind');
+const successResponse = require('../../utils/response');
 
 class AuthenticationsHandler {
     constructor({
@@ -9,95 +10,57 @@ class AuthenticationsHandler {
         this._tokenManager = tokenManager;
         this._validator = validator;
 
-        this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this);
-        this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this);
-        this.deleteAuthenticationHandler = this.deleteAuthenticationHandler.bind(this);
+        autoBind(this);
     }
 
-    async postAuthenticationHandler(request, h) {
-        try {
-            this._validator.validatePostAuthenticationPayload(request.payload);
+    async postAuthenticationHandler({ payload }, h) {
+        this._validator.validatePostAuthenticationPayload(payload);
 
-            const { username, password } = request.payload;
-            const id = await this._usersService.verifyUserCrendential(username, password);
+        const { username, password } = payload;
+        const id = await this._usersService.verifyUserCrendential(username, password);
 
-            const jwtAccessToken = this._tokenManager.generateAccessToken({ id });
-            const jwtRefreshToken = this._tokenManager.generateRefreshToken({ id });
+        const jwtAccessToken = this._tokenManager.generateAccessToken({ id });
+        const jwtRefreshToken = this._tokenManager.generateRefreshToken({ id });
 
-            await this._authenticationsService.addRefreshToken(jwtRefreshToken);
+        await this._authenticationsService.addRefreshToken(jwtRefreshToken);
 
-            const response = h.response({
-                status: 'success',
-                message: 'Authentication berhasil ditambahkan',
-                data: {
-                    accessToken: jwtAccessToken,
-                    refreshToken: jwtRefreshToken,
-                },
-            });
-
-            response.code(201);
-            return response;
-        } catch (error) {
-            return this.errorResponse(error, h);
-        }
-    }
-
-    async putAuthenticationHandler(request, h) {
-        try {
-            this._validator.validatePutAuthenticationPayload(request.payload);
-
-            const { refreshToken } = request.payload;
-            await this._tokenManager.verifyRefreshToken(refreshToken);
-            const { id } = this._authenticationsService.verifyRefreshToken(refreshToken);
-
-            const jwtAccessToken = this._tokenManager.generateAccessToken({ id });
-
-            return {
-                status: 'success',
-                message: 'Authentication berhasil diperbarui',
-                data: {
-                    accessToken: jwtAccessToken,
-                },
-            };
-        } catch (error) {
-            return this.errorResponse(error, h);
-        }
-    }
-
-    async deleteAuthenticationHandler(request, h) {
-        try {
-            this._validator.validateDeleteAuthenticationPayload(request.payload);
-
-            const { refreshToken } = request.payload;
-            await this._tokenManager.verifyRefreshToken(refreshToken);
-            await this._authenticationsService.deleteRefreshToken(refreshToken);
-
-            return {
-                status: 'success',
-                message: 'Refresh token berhasil dihapus',
-            };
-        } catch (error) {
-            return this.errorResponse(error, h);
-        }
-    }
-
-    errorResponse(error, server) {
-        if (error instanceof ClientError) {
-            const response = server.response({
-                status: 'fail',
-                message: error.message,
-            });
-            response.code(error.statusCode);
-            return response;
-        }
-
-        // Server ERROR!
-        const response = server.response({
-            status: 'error',
-            message: 'Maaf, terjadi kegagalan pada server kami.',
+        return successResponse(h, {
+            message: 'Authentication berhasil ditambahkan',
+            data: {
+                accessToken: jwtAccessToken,
+                refreshToken: jwtRefreshToken,
+            },
+            statusCode: 201,
         });
-        response.code(500);
-        return response;
+    }
+
+    async putAuthenticationHandler({ payload }, h) {
+        this._validator.validatePutAuthenticationPayload(payload);
+
+        const { refreshToken } = payload;
+        await this._tokenManager.verifyRefreshToken(refreshToken);
+        const { id } = this._authenticationsService.verifyRefreshToken(refreshToken);
+
+        const jwtAccessToken = this._tokenManager.generateAccessToken({ id });
+
+        return successResponse(h, {
+            message: 'Authentication berhasil diperbarui',
+            data: {
+                accessToken: jwtAccessToken,
+            },
+        });
+    }
+
+    async deleteAuthenticationHandler({ payload }, h) {
+        this._validator.validateDeleteAuthenticationPayload(payload);
+
+        const { refreshToken } = payload;
+        await this._tokenManager.verifyRefreshToken(refreshToken);
+        await this._authenticationsService.deleteRefreshToken(refreshToken);
+
+        return successResponse(h, {
+            message: 'Refresh token berhasil dihapus',
+        });
     }
 }
 
