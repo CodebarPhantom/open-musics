@@ -20,7 +20,7 @@ class UploadImagesHandler {
         return successResponse(h, {
             message: 'Gambar berhasil diunggah',
             data: {
-                pictureUrl: `http://${process.env.HOST}:${process.env.PORT}/upload/${filename}`,
+                pictureUrl: `http://${process.env.HOST}:${process.env.PORT}/upload/pictures/${filename}`,
             },
             statusCode: 201,
         });

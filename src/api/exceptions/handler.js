@@ -12,6 +12,10 @@ const ErrorPreResponse = {
                 newResponse.code(response.statusCode);
                 return newResponse;
             }
+
+            if (!response.isServer) {
+                return h.continue;
+            }
             
             const newResponse = h.response({
                 status: 'error',
