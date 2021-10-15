@@ -2,6 +2,11 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
+const path = require('path');
+
+// error for pre response
+const errorPreResponse = require('./api/exceptions');
 
 // songs
 const songs = require('./api/songs');
@@ -31,23 +36,26 @@ const CollaborationsValidator = require('./validator/collaborations');
 
 // exports
 const _exports = require('./api/exports');
-const ProducerService = require('./service/exports/ProducerService');
+const ProducerService = require('./services/exports/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
 // uploads
 const uploads = require('./api/uploads');
-const UploadsService = require('./service/uploads/UploadsService');
+const UploadsService = require('./services/uploads/UploadsService');
 const UploadsValidator = require('./validator/uploads');
+
+// caching
+const CacheControl = require('./services/cache/CacheControl');
 
 
 const init = async () => {
-
-    const songsService = new SongsService();
+    const cacheControl = new CacheControl();
+    const songsService = new SongsService(cacheControl);
     const usersService = new UsersService();
     const authenticationsService = new AuthenticationsService();
-    const collaborationsService = new CollaborationsService();
-    const playlistsService = new PlaylistsService(collaborationsService);
-    const uploadsService = new UploadsService(path.resolve(__dirname, process.env.UPLOADS_DIRECTORY));
+    const collaborationsService = new CollaborationsService(cacheControl);
+    const playlistsService = new PlaylistsService(collaborationsService, cacheControl);
+    const uploadsService = new UploadsService(path.resolve(__dirname, 'api/uploads/'));
 
     const server = Hapi.server({
         host: process.env.HOST,
@@ -59,10 +67,12 @@ const init = async () => {
         },
     });
 
-    //plugin eksternal JWT
     await server.register([
         {
             plugin: Jwt,
+        },
+        {
+            plugin: Inert,
         },
     ]);
 
@@ -84,6 +94,9 @@ const init = async () => {
     });
 
     await server.register([
+        {
+            plugin: errorPreResponse,
+        },
         {
             plugin: songs,
             options: {
@@ -137,7 +150,6 @@ const init = async () => {
                 validator: UploadsValidator,
             },
         },
-        
     ]);
 
     server.start();

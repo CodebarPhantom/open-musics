@@ -7,6 +7,7 @@
         "dev": "nodemon ./src/server.js",
         "prod": "NODE_ENV=production node ./src/server.js",
         "lint": "eslint ./src",
+        "consume": "node ./consumer/consume.js",
         "migrate": "node-pg-migrate"
     },
     "keywords": [],

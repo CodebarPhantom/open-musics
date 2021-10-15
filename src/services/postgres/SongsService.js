@@ -2,11 +2,12 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const { mapDBToModel, mapGetSongs } = require('../../utils/mapDBModel');;
+const { mapDBToModel } = require('../../utils/mapDBModel');
 
 class SongsService {
-    constructor() {
+    constructor(cacheControl) {
         this._pool = new Pool();
+        this._cacheControl = cacheControl;
     }
 
     async addSongs({
@@ -26,12 +27,21 @@ class SongsService {
             throw new InvariantError('Music gagal ditambahkan');
         }
 
+        await this._cacheControl.del('songs');
+
         return result.rows[0].id;
     }
 
     async getSongs() {
-        const result = await this._pool.query('SELECT id, title, performer FROM songs');
-        return result.rows.map(mapGetSongs);
+        try {
+            const result = await this._cacheControl.get('songs');
+            return JSON.parse(result);
+        } catch (error) {
+            const result = await this._pool.query('SELECT id, title, performer FROM songs');
+            await this._cacheControl.set('songs', JSON.stringify(result.rows), (60 * 30));
+
+            return result.rows;
+        }
     }
 
     async getSongById(id) {
@@ -45,6 +55,8 @@ class SongsService {
         if (!result.rowCount) {
             throw new NotFoundError('Music tidak ditemukan');
         }
+
+        await this._cacheControl.del('songs');
 
         return result.rows.map(mapDBToModel)[0];
     }
@@ -63,6 +75,8 @@ class SongsService {
         if (!result.rowCount) {
             throw new NotFoundError('Gagal memperbarui music. Id tidak ditemukan!');
         }
+
+        await this._cacheControl.del('songs');
     }
 
     async deleteSongById(id) {
@@ -76,6 +90,8 @@ class SongsService {
         if (!result.rowCount) {
             throw new NotFoundError('Gagal menghapus music. Id tidak ditemukan!');
         }
+
+        await this._cacheControl.del('songs');
     }
 }
 

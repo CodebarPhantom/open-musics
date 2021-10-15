@@ -1,4 +1,3 @@
-
 const Joi = require('joi');
 
 const postCollaborationSchema = Joi.object({

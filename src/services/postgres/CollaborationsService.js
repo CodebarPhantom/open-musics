@@ -3,8 +3,9 @@ const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class CollaborationsService {
-    constructor() {
+    constructor(cacheControl) {
         this._pool = new Pool();
+        this._cacheControl = cacheControl;
     }
 
     async addCollaboration(playlistId, userId) {
@@ -20,6 +21,9 @@ class CollaborationsService {
             throw new InvariantError('Gagal menambahkan kolaborasi');
         }
 
+        await this._cacheControl.del(`songs:${playlistId}`);
+        await this._cacheControl.del(`playlists:${userId}`);
+
         return result.rows[0].id;
     }
 
@@ -34,6 +38,9 @@ class CollaborationsService {
         if (!result.rowCount) {
             throw new InvariantError('Gagal menghapus kolaborasi');
         }
+
+        await this._cacheControl.del(`songs:${playlistId}`);
+        await this._cacheControl.del(`playlists:${userId}`);
     }
 
     async verifyCollaborator(playlistId, userId) {
